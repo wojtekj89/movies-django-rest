@@ -8,3 +8,6 @@ from .serializers import MovieSerializer
 class MoviesView(ListModelMixin, GenericViewSet):
     queryset = Movie.objects.all()
     serializer_class = MovieSerializer
+
+    def create(self, request, *args, **kwargs):
+        pass
