@@ -11,4 +11,12 @@ def get_movie(title):
     r = requests.get(settings.OMDB_URL, params=params)
     response = r.json()
 
-    return response
+    if not r.ok:
+        raise requests.exceptions(r.status_code, 'OMDB API error')
+        
+    else:
+        response = r.json()
+        if response['Response'] == 'False':
+            raise (requests.exceptions.HTTPError(404, response['Error']))
+        else:
+            return response
