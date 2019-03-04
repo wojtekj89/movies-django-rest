@@ -2,7 +2,7 @@ from django.db.models import Model, CharField, ForeignKey, TextField, DateTimeFi
 
 class Movie(Model):
     title = CharField(max_length=100)
-    year = CharField(max_length=5)
+    year = CharField(max_length=25)
     genre = CharField(max_length=50)
     country = CharField(max_length=50)
     plot = TextField()
