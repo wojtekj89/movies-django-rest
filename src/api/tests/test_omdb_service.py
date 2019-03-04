@@ -11,7 +11,6 @@ class OMDBTest(TestCase):
     def test_real_request(self):
         r = get_movie('django')
 
-        self.assertEqual(r.status_code, 200)
         self.assertEqual(r['Title'], 'Django')
 
     @patch('api.services.requests.get')
