@@ -13,10 +13,11 @@ def get_movie(title):
 
     if not r.ok:
         raise requests.exceptions(r.status_code, 'OMDB API error')
-        
+
     else:
         response = r.json()
         if response['Response'] == 'False':
+            """ When OMDB API can't find a movie status code is 200 """
             raise (requests.exceptions.HTTPError(404, response['Error']))
         else:
             return response
