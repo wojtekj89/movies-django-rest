@@ -10,7 +10,6 @@ class MoviesListTest(TestCase):
         self.factory = RequestFactory()
         self.movie1 = mixer.blend('api.Movie')
         self.movie2 = mixer.blend('api.Movie')
-        print(str(self.movie1))
 
     def test_movies(self):
         request = self.factory.get('/movies')
