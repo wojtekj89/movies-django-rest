@@ -1,2 +1,4 @@
+import requests
+
 def get_movie(title):
-    return Null
+    return None
