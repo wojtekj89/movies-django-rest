@@ -115,4 +115,4 @@ class TopView(APIView):
         } for movie in movies_query
         ]
 
-        return Response('movies')
+        return Response(movies)
