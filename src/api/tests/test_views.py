@@ -1,7 +1,7 @@
 from django.test import RequestFactory, TestCase
 
 from mixer.backend.django import mixer
-from api.views import MoviesView
+from api.views import MoviesView, CommentsView
 
 
 class MoviesListTest(TestCase):
@@ -76,3 +76,54 @@ class MovieCreateAndGetTest(TestCase):
         self.assertEqual(len(payload), 1)
         self.assertTrue(self.title in str(payload))
 
+class CommentListTest(TestCase):
+
+    def setUp(self):
+        self.factory = RequestFactory()
+        self.comment1 = mixer.blend('api.Comment')
+        self.comment2 = mixer.blend('api.Comment', movie_id=111)
+
+    def test_all_comments(self):
+        request = self.factory.get('/comments')
+        response = CommentsView.as_view({'get': 'list'})(request)
+        self.assertEqual(response.status_code, 200)
+        payload = response.data
+        self.assertEqual(len(payload), 2)
+        self.assertTrue(str(self.comment1.test) in str(payload))
+
+    def test_filtered_comments(self):
+        request = self.factory.get('/comments?movie_id=111')
+        response = CommentsView.as_view({'get': 'list'})(request)
+        self.assertEqual(response.status_code, 200)
+        payload = response.data
+        self.assertEqual(len(payload), 1)
+
+class CommentCreateTest(TestCase):
+
+    def setUp(self):
+        self.factory = RequestFactory()
+        self.movie1 = mixer.blend('api.Movie')
+
+    def test_add_comment(self):
+        request = self.factory.post('/comments', data={'movie_id': self.movie1.id, 'text': 'comment1'})
+        response = MoviesView.as_view({"post": "create"})(request)
+        self.assertEqual(response.status_code, 201)
+
+    def test_add_comment_when_no_movie(self):
+        request = self.factory.post('/comments', data={'movie_id': self.movie1.id + 10, 'text': 'comment1'})
+        response = MoviesView.as_view({"post": "create"})(request)
+        self.assertEqual(response.status_code, 400)
+    
+    def test_incorrect_id_type(self):
+        request = self.factory.post('/comments', data={'movie_id': "wrong", 'text': 'comment1'})
+        response = MoviesView.as_view({"post": "create"})(request)
+        self.assertEqual(response.status_code, 400)
+
+    def test_invalid_comment(self):
+        request = self.factory.post('/comments', data={'movie_id': self.movie1.id, 'text': ''})
+        response = MoviesView.as_view({"post": "create"})(request)
+        self.assertDictEqual(response.status_code, 400)
+
+        request = self.factory.post('/comments', data={'text': 'asd'})
+        response = MoviesView.as_view({"post": "create"})(request)
+        self.assertDictEqual(response.status_code, 400)
