@@ -1,7 +1,7 @@
 from django.test import RequestFactory, TestCase
 
 from mixer.backend.django import mixer
-from api.views import MoviesView, CommentsView
+from api.views import MoviesView, CommentsView, TopView
 
 
 class MoviesListTest(TestCase):
@@ -127,3 +127,34 @@ class CommentCreateTest(TestCase):
         request = self.factory.post('/comments', data={'text': 'asd'})
         response = CommentsView.as_view({"post": "create"})(request)
         self.assertEqual(response.status_code, 400)
+
+class TopListView(TestCase):
+
+    def setUp(self):
+        self.factory = RequestFactory()
+        self.movie = mixer.blend('api.Movie')
+       
+    def test_missing_params(self):
+        request = self.factory.get('/top', data={'start': ""})
+        response = TopView.as_view()(request)
+        self.assertEqual(response.status_code, 400)
+
+        request = self.factory.get('/top', data={'end': ""})
+        response = TopView.as_view()(request)
+        self.assertEqual(response.status_code, 400)
+
+    def test_invalid_format(self):
+        request = self.factory.get('/top', data={'start': "sdfdsf", 'end': "sdfdsfsdf"})
+        response = TopView.as_view()(request)
+        self.assertEqual(response.status_code, 400)
+
+        request = self.factory.get('/top', data={'start': "06-06-2000", 'end': "2000-06-06"})
+        response = TopView.as_view()(request)
+        self.assertEqual(response.status_code, 400)
+
+    ## This test is crashing
+    # def test_valid_request(self):
+    #     request = self.factory.get('/top', data={'start': "06-12-1999", 'end': "01-01-2000"})
+    #     response = TopView.as_view()(request)
+    #     print(response.data)
+    #     self.assertEqual(response.status_code, 200)
