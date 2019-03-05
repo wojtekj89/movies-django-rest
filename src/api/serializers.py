@@ -1,5 +1,5 @@
 from rest_framework.serializers import ModelSerializer, PrimaryKeyRelatedField, Serializer, CharField
-from .models import Movie
+from .models import Movie, Comment
 
 
 class MovieSerializer(ModelSerializer):
@@ -16,3 +16,10 @@ class MovieRequestSerializer(Serializer):
 
     def update(self, instance, data):
         instance['title'] = data.get('title', instance['title'])
+
+class CommentSerializer(ModelSerializer):
+    movie_id = PrimaryKeyRelatedField(queryset=Movie.objects.all())
+
+    class Meta:
+        model = Comment
+        fields = ('id', 'movie_id', 'text')

@@ -5,8 +5,10 @@ from rest_framework.response import Response
 
 from django.db import IntegrityError
 
-from .models import Movie
-from .serializers import MovieSerializer, MovieRequestSerializer
+from django.shortcuts import get_object_or_404
+
+from .models import Movie, Comment
+from .serializers import MovieSerializer, MovieRequestSerializer, CommentSerializer
 
 from .services import get_movie
 
@@ -44,3 +46,23 @@ class MoviesView(ListModelMixin, GenericViewSet):
             return Response({'error': ''}, status=HTTP_409_CONFLICT)
 
         return Response(MovieSerializer(movie).data, status=HTTP_201_CREATED)
+
+class CommentsView(ListModelMixin, GenericViewSet, CreateModelMixin):
+    serializer_class = CommentSerializer
+
+    def get_queryset(self):
+        """Optionally filter to `movie_id` passed in querystring."""
+        queryset = Comment.objects.all()
+        movie_id = self.request.query_params.get('movie_id', None)
+        if movie_id is not None:
+            try:
+                movie_id = int(movie_id)
+            except ValueError:
+                raise exceptions.ValidationError({
+                    'movie_id': [
+                        'Incorrect movie_id type. Expected int.',
+                    ],
+                })
+            movie = get_object_or_404(Movie, id=movie_id)
+            queryset = queryset.filter(movie_id=movie)
+        return queryset
