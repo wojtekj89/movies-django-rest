@@ -127,3 +127,31 @@ class CommentCreateTest(TestCase):
         request = self.factory.post('/comments', data={'text': 'asd'})
         response = CommentsView.as_view({"post": "create"})(request)
         self.assertEqual(response.status_code, 400)
+
+class TopListView(TestCase):
+
+    def setUp(self):
+        self.factory = RequestFactory()
+       
+    def test_missing_params(self):
+        request = self.factory.get('/top', data={'start': ""})
+        response = TopView.as_view({"get": "list"})(request)
+        self.assertEqual(response.status_code, 400)
+
+        request = self.factory.get('/top', data={'end': ""})
+        response = TopView.as_view({"get": "list"})(request)
+        self.assertEqual(response.status_code, 400)
+
+    def test_invalid_format(self):
+        request = self.factory.get('/top', data={'start': "sdfdsf", 'end': "sdfdsfsdf"})
+        response = TopView.as_view({"get": "list"})(request)
+        self.assertEqual(response.status_code, 400)
+
+        request = self.factory.get('/top', data={'start': "06-06-2000", 'end': "2000-06-06"})
+        response = TopView.as_view({"get": "list"})(request)
+        self.assertEqual(response.status_code, 400)
+
+    def test_valid_request(self):
+        request = self.factory.get('/top', data={'start': "06-06-1900", 'end': "01-01-2000"})
+        response = TopView.as_view({"get": "list"})(request)
+        self.assertEqual(response.status_code, 200)
