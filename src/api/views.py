@@ -12,6 +12,8 @@ from django.db.models.expressions import Window
 
 from django.shortcuts import get_object_or_404
 
+from rest_framework.filters import SearchFilter, OrderingFilter
+
 from .models import Movie, Comment
 from .serializers import MovieSerializer, MovieRequestSerializer, CommentSerializer
 
@@ -23,6 +25,9 @@ import datetime
 class MoviesView(ListModelMixin, GenericViewSet):
     queryset = Movie.objects.all()
     serializer_class = MovieSerializer
+    filter_backends = (SearchFilter, OrderingFilter)
+    search_fields = ('title', 'genre')
+    ordering_fields = ('title', 'year')
 
     def create(self, request, *args, **kwargs):
         request = MovieRequestSerializer(data=request.data)
@@ -53,7 +58,7 @@ class MoviesView(ListModelMixin, GenericViewSet):
         except:
             return Response({'error': ''}, status=HTTP_409_CONFLICT)
 
-        return Response(MovieSerializer(movie).data, status=HTTP_201_CREATED)
+        return Response(omdb_data, status=HTTP_201_CREATED)
 
 
 class CommentsView(ListModelMixin, GenericViewSet, CreateModelMixin):

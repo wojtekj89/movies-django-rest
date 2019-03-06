@@ -6,6 +6,8 @@ class MovieSerializer(ModelSerializer):
     class Meta:
         model = Movie
         fields = ('id', 'title', 'year', 'genre', 'country', 'plot')
+        read_only_fields = ('year', 'genre', 'country', 'plot')
+
 
 class MovieRequestSerializer(Serializer):
     """Checking if POST request is valid """
@@ -16,6 +18,7 @@ class MovieRequestSerializer(Serializer):
 
     def update(self, instance, data):
         instance['title'] = data.get('title', instance['title'])
+
 
 class CommentSerializer(ModelSerializer):
     movie_id = PrimaryKeyRelatedField(queryset=Movie.objects.all())
