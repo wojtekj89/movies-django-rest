@@ -86,4 +86,4 @@ Creates a new comment in the database. Requires movie_id and text parameters.
 
 ### GET
 
-Ranked and sorted list of movies by number of comments in specified date range. Requires start and end parameters with date in `DD-MM-YY` format.
+Ranked and sorted list of movies by number of comments in specified date range. Requires start and end parameters with date in `DD-MM-YY` format. This endpoint will not work in the browser. It requires parameters in the request body.
