@@ -123,3 +123,8 @@ OMDB_URL = 'http://www.omdbapi.com/'
 
 
 django_heroku.settings(locals())
+
+try:
+    from core.local_settings import *
+except ImportError:
+    pass
